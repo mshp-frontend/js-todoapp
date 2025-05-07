@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой TODO-лист</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Мой список дел</h1>
+        <div class="add-todo">
+            <input type="text" id="newTodo" placeholder="Введите новую задачу">
+            <button onclick="addTodo()">Добавить</button>
+        </div>
+        <div id="todoList"></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Заметка к задаче</h2>
+            <textarea id="modalNote" rows="6" placeholder="Введите заметку..."></textarea>
+            <button onclick="saveModalNote()">Сохранить</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
