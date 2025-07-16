@@ -3,27 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Простой TODO-лист</title>
+    <title>Мой список дел</title>
+    <link rel="shortcut icon" href="icon.png" type="image/png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Мой список дел</h1>
-        <div class="add-todo">
-            <input type="text" id="newTodo" placeholder="Введите новую задачу">
-            <button onclick="addTodo()">Добавить</button>
-        </div>
-        <div id="todoList"></div>
-    </div>
+    <main>
+        <header>
+            <img src="icon.png" alt="✅">
+            <h1>Мой список дел</h1>
+        </header>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Заметка к задаче</h2>
-            <textarea id="modalNote" rows="6" placeholder="Введите заметку..."></textarea>
-            <button onclick="saveModalNote()">Сохранить</button>
-        </div>
-    </div>
+        <section>
+            <div class="add">
+                <form id="addTodo">
+                    <input autofocus type="text" name="newTodo" id="newTodo" placeholder="Что мне нужно сделать...">
+                    <button type="submit">+</button>
+                </form>
+                <p class="existing">У меня уже есть такая задача 😅</p>
+            </div>
+    
+            <ul id="todos">
+                <!-- <li class="todo">
+                    <input type="checkbox">
+                    <p>Сделать что-то хорошее</p>
+                    <button>&times;</button>
+                </li> -->
+            </ul>
+        </section>
+
+    </main>
 
     <script src="app.js"></script>
 </body>

@@ -1,120 +1,96 @@
-let todos = JSON.parse(localStorage.getItem('todos')) || [];
-let currentTodoId = null;
+let todos = ['Сделать что-то хорошее'];
+let checked = [false];
+
+let externalTodos = localStorage.getItem('todos');
+let externalChecked = localStorage.getItem('checked');
+
+if (externalTodos !== null) {
+    todos = JSON.parse(externalTodos);
+    checked = JSON.parse(externalChecked);
+}
+
+function renderTodos() {
+    const todoList = document.getElementById('todos');
+    todoList.innerHTML = '';
+
+    for (let i = 0; i < todos.length; i++) {
+        let todoText = todos[i];
+        let todoCompleted = checked[i];
+
+        const todoElement = document.createElement('li');
+        todoElement.className = 'todo';
+
+        todoElement.innerHTML = `
+            <input type="checkbox"${todoCompleted ? ' checked' : ' '}
+                   onclick="event.stopPropagation();completeTodo(${i})">
+            <p>${todoText}</p>
+            <button onclick="event.stopPropagation();deleteTodo(${i})">&times;</button>
+        `;
+
+        todoList.appendChild(todoElement);
+    }
+}
 
 function saveTodos() {
     localStorage.setItem('todos', JSON.stringify(todos));
+    localStorage.setItem('checked', JSON.stringify(checked));
 }
 
-function addTodo() {
+const newTodo = document.getElementById('addTodo');
+newTodo.addEventListener('submit', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
     const input = document.getElementById('newTodo');
+    const existingText = document.querySelector('p.existing');
     const text = input.value.trim();
-    
-    if (text) {
-        const todo = {
-            id: Date.now(),
-            text: text,
-            completed: false,
-            notes: ''
-        };
-        
-        todos.push(todo);
+    const submitButton = event.submitter;
+
+    if (text !== '') {
+        const todoExists = todos.indexOf(text) !== -1;
+
+        if (todoExists && submitButton) {
+            existingText.classList.add('appear');
+            submitButton.setAttribute('disabled', 'disabled');
+
+            setTimeout(function () {
+                existingText.classList.remove('appear');
+                submitButton.removeAttribute('disabled');
+            }, 800);
+
+            return;
+        }
+
+        todos.push(text);
+        checked.push(false);
+
         saveTodos();
         renderTodos();
         input.value = '';
     }
-}
+});
 
-function deleteTodo(id) {
-    todos = todos.filter(todo => todo.id !== id);
-    saveTodos();
-    renderTodos();
-}
+function deleteTodo(index) {
+    const updatedTodos = [];
+    const updatedChecked = [];
 
-function toggleTodo(id) {
-    todos = todos.map(todo => {
-        if (todo.id === id) {
-            return { ...todo, completed: !todo.completed };
+    for (let i = 0; i < todos.length; i++) {
+        if (index !== i) {
+            updatedTodos.push(todos[i]);
+            updatedChecked.push(checked[i]);
         }
-        return todo;
-    });
+    }
+
+    todos = updatedTodos;
+    checked = updatedChecked;
+
     saveTodos();
     renderTodos();
 }
 
-function openModal(id) {
-    const modal = document.getElementById('modal');
-    const todo = todos.find(t => t.id === id);
-    if (todo) {
-        currentTodoId = id;
-        document.getElementById('modalNote').value = todo.notes;
-        modal.style.display = 'block';
-        document.addEventListener('keydown', handleEscKey);
-    }
+function completeTodo(index) {
+    checked[index] = !checked[index];
+    saveTodos();
 }
-
-function saveModalNote() {
-    if (currentTodoId) {
-        const note = document.getElementById('modalNote').value;
-        todos = todos.map(todo => {
-            if (todo.id === currentTodoId) {
-                return { ...todo, notes: note };
-            }
-            return todo;
-        });
-        saveTodos();
-        renderTodos();
-        closeModal();
-    }
-}
-
-function closeModal() {
-    const modal = document.getElementById('modal');
-    modal.style.display = 'none';
-    currentTodoId = null;
-    document.removeEventListener('keydown', handleEscKey);
-}
-
-function handleEscKey(event) {
-    if (event.key === 'Escape') {
-        closeModal();
-    }
-}
-
-function renderTodos() {
-    const todoList = document.getElementById('todoList');
-    todoList.innerHTML = '';
-    
-    todos.forEach(todo => {
-        const todoElement = document.createElement('div');
-        todoElement.className = `todo-item ${todo.completed ? 'completed' : ''}`;
-        
-        todoElement.innerHTML = `
-            <input type="checkbox" ${todo.completed ? 'checked' : ''} 
-                   onclick="event.stopPropagation(); toggleTodo(${todo.id})">
-            <div class="todo-content" onclick="openModal(${todo.id})">
-                <div class="todo-text">${todo.text}</div>
-                <div class="todo-notes">${todo.notes}</div>
-            </div>
-            <button class="delete-btn" onclick="event.stopPropagation(); deleteTodo(${todo.id})">Удалить</button>
-        `;
-        
-        todoList.appendChild(todoElement);
-    });
-}
-
-document.getElementById('newTodo').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        addTodo();
-    }
-});
-
-document.querySelector('.close').addEventListener('click', closeModal);
-
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('modal');
-    if (event.target === modal) {
-        closeModal();
-    }
-});
 
 renderTodos();
